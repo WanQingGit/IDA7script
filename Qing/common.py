@@ -104,6 +104,7 @@ def get_arch():
     registers = idaapi.dbg_get_registers()
     if not registers:
         print('please select debugger first')
+        return None
     for x in registers:
         name = x[0]
         if name == 'RAX':
@@ -130,10 +131,11 @@ def get_arch():
 
 
 class ARCH(object):
+    arch = None
+    bits = 0
 
     def __init__(self):
-        self.arch = None
-        self.bits = 0
+        pass
 
     def ip(self):
         raise NotImplementedError

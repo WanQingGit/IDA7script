@@ -20,7 +20,7 @@ SCAN_ANY_TYPE = False
 def add_default_settings(config):
     updated = False
     if not config.has_option("DEFAULT", "DEBUG_MESSAGE_LEVEL"):
-        print DEBUG_MESSAGE_LEVEL
+        print(DEBUG_MESSAGE_LEVEL)
         config.set(None, 'DEBUG_MESSAGE_LEVEL', str(DEBUG_MESSAGE_LEVEL))
         updated = True
     if not config.has_option("DEFAULT", "PROPAGATE_THROUGH_ALL_NAMES"):
