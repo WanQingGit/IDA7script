@@ -81,7 +81,7 @@ _cached_refs = {}
 
 def get_func_hash(ea):
     m = md5.new()
-    ea = sark.Function(ea).startEA
+    ea = sark.Function(ea).start_ea
     blk = sark.CodeBlock(ea)
     went_over_blks = set()
     rem_blks = [blk]
@@ -90,12 +90,12 @@ def get_func_hash(ea):
         blk = rem_blks[0]
         rem_blks = rem_blks[1:]
         m.update('s')
-        m.update(struct.pack(">L", blk.startEA))
+        m.update(struct.pack(">L", blk.start_ea))
         for n_blk in blk.next:
-            m.update(struct.pack(">L", n_blk.startEA))
-            if n_blk.startEA not in went_over_blks:                
+            m.update(struct.pack(">L", n_blk.start_ea))
+            if n_blk.start_ea not in went_over_blks:
                 rem_blks += [n_blk]
-        went_over_blks.add(blk.startEA)
+        went_over_blks.add(blk.start_ea)
     return m.digest()
 
         
@@ -110,7 +110,7 @@ def get_refs(ea=None, reg='d15', do_print=False):
     global _cached_refs
     
     if ea is None:
-        ea = ScreenEA()
+        ea = get_screen_ea()
             
     ea = sark.Line(ea).ea #get ea that is start of line       
     func_hash = get_func_hash(ea)
@@ -149,7 +149,7 @@ def get_refs(ea=None, reg='d15', do_print=False):
 # returns tuple with (found_lines, found_breaks)   
 def _get_refs(ea=None, reg='d15', do_print=False):
     if ea is None:
-        ea = ScreenEA()
+        ea = get_screen_ea()
             
     debug('Start search - ea=%x, reg=%s' % (ea, reg))
     ea = sark.Line(ea).ea #get ea that is start of line       
@@ -180,30 +180,30 @@ def _get_refs(ea=None, reg='d15', do_print=False):
     # go forward
     initstage = ('w' in op)
     
-    fw_found_lines, fw_found_breaks, fw_found_outbreaks, fw_stop, fw_initstage = get_refs_blk(ea_next(ea), blk.startEA, FW, initstage, reg)       
+    fw_found_lines, fw_found_breaks, fw_found_outbreaks, fw_stop, fw_initstage = get_refs_blk(ea_next(ea), blk.start_ea, FW, initstage, reg)
     found_lines.update(fw_found_lines)
     found_breaks.update(fw_found_breaks)
     found_outbreaks.update(fw_found_outbreaks)
     
     if not fw_stop:
         for n_blk in blk.next:
-            debug('added start: %x, %s' % (n_blk.startEA, ['bk', 'fw'][FW]))
-            remaining_blks += [(FW, fw_initstage, n_blk.startEA)]
+            debug('added start: %x, %s' % (n_blk.start_ea, ['bk', 'fw'][FW]))
+            remaining_blks += [(FW, fw_initstage, n_blk.start_ea)]
                 
     
     #go backwards - only if reg is not a STOP op in current ea
     stop = (op=='w')
     
     if not stop:
-        bk_found_lines, bk_found_breaks, bk_found_outbreaks, bk_stop, bk_initstage = get_refs_blk(ea, blk.startEA, BK, initstage, reg)        
+        bk_found_lines, bk_found_breaks, bk_found_outbreaks, bk_stop, bk_initstage = get_refs_blk(ea, blk.start_ea, BK, initstage, reg)
         
         found_lines.update(bk_found_lines)
         found_breaks.update(bk_found_breaks)
         found_outbreaks.update(bk_found_outbreaks)
         if not bk_stop:
             for p_blk in blk.prev:
-                debug('added start: %x, %s' % (p_blk.startEA, ['bk', 'fw'][BK]))
-                remaining_blks += [(BK, bk_initstage, p_blk.startEA)]
+                debug('added start: %x, %s' % (p_blk.start_ea, ['bk', 'fw'][BK]))
+                remaining_blks += [(BK, bk_initstage, p_blk.start_ea)]
          
         
     #go over blks - until there are no more
@@ -215,9 +215,9 @@ def _get_refs(ea=None, reg='d15', do_print=False):
         
         blk = CodeBlock(blk_ea)
         if dir==FW:
-            first_ea = blk.startEA
+            first_ea = blk.start_ea
         elif dir==BK:
-            first_ea = blk.endEA
+            first_ea = blk.end_ea
                     
         blk_found_lines, blk_found_breaks, blk_found_outbreaks, blk_stop, blk_initstage = get_refs_blk(first_ea, blk_ea, dir, initstage, reg)
         found_lines.update(blk_found_lines)
@@ -230,7 +230,7 @@ def _get_refs(ea=None, reg='d15', do_print=False):
             should_rev = True
             debug('found lines in blk. reversing')
         #if we are going backwards in first block of function, and there was no usage or reason to stop
-        elif dir==BK and blk.startEA==sark.Function(blk.startEA).startEA: # and not blk_stop:
+        elif dir==BK and blk.start_ea==sark.Function(blk.start_ea).start_ea: # and not blk_stop:
             should_rev = True
             debug('first block. reversing')
             
@@ -242,10 +242,10 @@ def _get_refs(ea=None, reg='d15', do_print=False):
                 blks = blk.next
                 
             for e_blk in blks:
-                if (1-dir, e_blk.startEA) not in used_blks:
-                    debug('added (rev): %x, %s' % (e_blk.startEA, ['bk', 'fw'][1-dir]))
-                    used_blks.add((1-dir, e_blk.startEA))
-                    remaining_blks += [(1-dir, initstage, e_blk.startEA)]                 
+                if (1-dir, e_blk.start_ea) not in used_blks:
+                    debug('added (rev): %x, %s' % (e_blk.start_ea, ['bk', 'fw'][1-dir]))
+                    used_blks.add((1-dir, e_blk.start_ea))
+                    remaining_blks += [(1-dir, initstage, e_blk.start_ea)]
         
         #if didn't stop -> add blocks in same direction, and use new initstage
         if not blk_stop:
@@ -255,10 +255,10 @@ def _get_refs(ea=None, reg='d15', do_print=False):
                 blks = blk.prev
                 
             for e_blk in blks:
-                if (dir, e_blk.startEA) not in used_blks:
-                    debug('added (same): %x, %s' % (e_blk.startEA, ['bk', 'fw'][dir]))
-                    used_blks.add((dir, e_blk.startEA))
-                    remaining_blks += [(dir, blk_initstage, e_blk.startEA)]
+                if (dir, e_blk.start_ea) not in used_blks:
+                    debug('added (same): %x, %s' % (e_blk.start_ea, ['bk', 'fw'][dir]))
+                    used_blks.add((dir, e_blk.start_ea))
+                    remaining_blks += [(dir, blk_initstage, e_blk.start_ea)]
 
          
 
@@ -293,9 +293,9 @@ def get_refs_blk(ea, blk_ea, dir, initstage, reg):
 
     blk = CodeBlock(blk_ea)
     if dir==FW:
-        lines = sark.lines(start=ea, end=blk.endEA)
+        lines = sark.lines(start=ea, end=blk.end_ea)
     elif dir==BK:
-        lines = sark.lines(start=blk.startEA, end=ea, reverse=True)
+        lines = sark.lines(start=blk.start_ea, end=ea, reverse=True)
 
     found_lines = {}
     found_breaks = {}
@@ -356,7 +356,7 @@ def get_refs_blk(ea, blk_ea, dir, initstage, reg):
 #################################    
 
 def ea_next(ea):
-    return sark.Line(ea).endEA
+    return sark.Line(ea).end_ea
     
 #fix a bug where sometimes blocks are outside the function    
 def CodeBlock(ea):
@@ -365,18 +365,18 @@ def CodeBlock(ea):
     next = []
     prev = []
     for e_cb in cb.next:
-        if sark.Function(e_cb.startEA).startEA == sark.Function(cb.startEA).startEA:
+        if sark.Function(e_cb.start_ea).start_ea == sark.Function(cb.start_ea).start_ea:
             next += [e_cb]
     for e_cb in cb.prev:
-        if sark.Function(e_cb.startEA).startEA == sark.Function(cb.startEA).startEA:
+        if sark.Function(e_cb.start_ea).start_ea == sark.Function(cb.start_ea).start_ea:
             prev += [e_cb]
         
     class new_cb(object):
         pass
     
     ncb = new_cb()
-    ncb.startEA = cb.startEA
-    ncb.endEA = cb.endEA
+    ncb.start_ea = cb.start_ea
+    ncb.end_ea = cb.end_ea
     ncb.next = next
     ncb.prev = prev
     return ncb
@@ -443,7 +443,7 @@ def get_reg_user_to_canon(ea=None):
     from ida_funcs import get_func
     
     if ea is None:
-        ea = idc.ScreenEA()
+        ea = idc.get_screen_ea()
 
     d = {}
 

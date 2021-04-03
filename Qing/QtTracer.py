@@ -214,7 +214,7 @@ class FuncTracer(QtBase.QtUiShow):
         if len(text) > 5:
             ea = int(text, 16)
         else:
-            ea = idc.ScreenEA()
+            ea = idc.get_screen_ea()
         dbginfo = self.dbginfo
 
         res = dbginfo.addTracebp(ea)
@@ -519,7 +519,7 @@ class FuncTracer(QtBase.QtUiShow):
         for i in range(n):
             bp = idc.get_bpt_ea(i)
             cfunc = idaapi.get_func(bp)
-            if cfunc and cfunc.startEA == bp:
+            if cfunc and cfunc.start_ea == bp:
                 idc.enable_bpt(bp, enable)
 
     def mode_switch(self):

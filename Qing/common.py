@@ -38,6 +38,7 @@ else:
 
 
     idc.GetMe = idc.print_insn_mnem
+    idc.ScreenEA = idc.get_screen_ea
 
 
     def GetMnem(ea):

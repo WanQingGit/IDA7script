@@ -15,7 +15,7 @@ def addBpFuncHead():
         cfunc = idaapi.get_func(ea)
         if cfunc.end_ea - cfunc.start_ea > 20:
             if not idc.add_bpt(ea):
-                idc.EnableBpt(ea, True)
+                idc.enable_bpt(ea, True)
 
 
 def delBpFuncHead():
@@ -338,14 +338,14 @@ from Qing.DisasmParser import DisasmInfo
 
 def func_instr(ea=None):
     if ea is None:
-        ea = idc.ScreenEA()
+        ea = idc.get_screen_ea()
     instrtable = {}
     func = idaapi.get_func(ea)
-    startEA = func.startEA
-    endEA = func.endEA
-    for head in idautils.Heads(startEA, endEA):
+    start_ea = func.start_ea
+    end_ea = func.end_ea
+    for head in idautils.Heads(start_ea, end_ea):
         disa = idc.GetDisasm(head)
-        disares = DisasmInfo(disa, head - startEA)
+        disares = DisasmInfo(disa, head - start_ea)
         insrt = disares.inst
         t = instrtable.get(insrt)
         if not t:

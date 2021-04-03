@@ -16,7 +16,7 @@ def _get_call_ea(ea):
         if xref.iscode==False:
             continue
         #if we reference somewhere outside the func - it is a call
-        if sark.Function(xref.to).startEA != sark.Function(ea).startEA:
+        if sark.Function(xref.to).start_ea != sark.Function(ea).start_ea:
             func_eas += [xref.to]
       
     num_refs = len(func_eas)
@@ -209,4 +209,3 @@ def is_load(ea, reg):
     else:
         return False
 
-   

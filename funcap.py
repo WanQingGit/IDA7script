@@ -45,7 +45,7 @@ import os
 from Qing.common import *
 # from idaapi import *
 # from idautils import *
-# from idc import *
+from idc import *
 
 # utility functions
 from idc import WFNE_SUSP
@@ -178,7 +178,7 @@ class FunCapHook(ida_dbg.DBG_Hooks):
         Add breakpoints on all function starts
         """
         for f in list(idautils.Functions()):
-            idc.AddBpt(f)
+            idc.add_bpt(f)
 
     def addFuncRet(self):
         """
@@ -192,7 +192,7 @@ class FunCapHook(ida_dbg.DBG_Hooks):
                 if idc.isCode(idc.GetFlags(head)):
 
                     if self.is_ret(head):
-                        idc.AddBpt(head)
+                        idc.add_bpt(head)
 
     def addCallee(self):
         """
@@ -213,7 +213,7 @@ class FunCapHook(ida_dbg.DBG_Hooks):
         if func:
             ea = idc.LocByName(func)
         else:
-            ea = idc.ScreenEA()
+            ea = idc.get_screen_ea()
             func = idc.GetFunctionName(ea)
 
         self.output("hooking function: %s()" % func)
@@ -245,7 +245,7 @@ class FunCapHook(ida_dbg.DBG_Hooks):
                 self.output("WARNING: cannot hook segment %s" % seg)
                 return
         else:
-            ea = idc.ScreenEA()
+            ea = idc.get_screen_ea()
             seg = idc.SegName(ea)
         self.output("hooking segment: %s" % seg)
         start_ea = idc.SegStart(ea)
@@ -270,7 +270,7 @@ class FunCapHook(ida_dbg.DBG_Hooks):
         """
 
         for bp in range(idc.GetBptQty(), 0, -1):
-            idc.DelBpt(idc.GetBptEA(bp))
+            idc.del_bpt(idc.GetBptEA(bp))
 
     def graph(self, exact_offsets=False):
         """
@@ -296,7 +296,7 @@ class FunCapHook(ida_dbg.DBG_Hooks):
         """
 
         self.stop_points.append(ea)
-        idc.AddBpt(ea)
+        idc.add_bpt(ea)
 
     ###
     # END of public interface
@@ -316,7 +316,7 @@ class FunCapHook(ida_dbg.DBG_Hooks):
             if idc.isCode(idc.GetFlags(head)):
 
                 if self.is_call(head):
-                    idc.AddBpt(head)
+                    idc.add_bpt(head)
 
     def add_call_and_jump_bp(self, start_ea, end_ea):
         """
@@ -333,7 +333,7 @@ class FunCapHook(ida_dbg.DBG_Hooks):
             if idc.isCode(idc.GetFlags(head)):
 
                 if (self.is_call(head) or self.is_jump(head)):
-                    idc.AddBpt(head)
+                    idc.add_bpt(head)
 
     def get_num_args_stack(self, addr):
         """
@@ -917,7 +917,7 @@ class FunCapHook(ida_dbg.DBG_Hooks):
             idc.SetColor(ea, idc.CIC_ITEM, self.ITEM_COLOR)
         (context_full, context_comments) = self.format_normal(raw_context)
         if self.delete_breakpoints:
-            idc.DelBpt(ea)
+            idc.del_bpt(ea)
 
         if self.comments and (self.overwrite_existing or ea not in self.visited):
             self.add_comments(ea, context_comments, every=True)
@@ -1206,7 +1206,7 @@ class FunCapHook(ida_dbg.DBG_Hooks):
             user_bp = True
         else:
             user_bp = False
-            AddBpt(ret_addr)  # catch return from the function if not user-added breakpoint
+            add_bpt(ret_addr)  # catch return from the function if not user-added breakpoint
 
         # fetch the operand for "ret" - will be needed when we will capture the return from the function
         ret_shift = self.calc_ret_shift(ea)
@@ -1256,9 +1256,9 @@ class FunCapHook(ida_dbg.DBG_Hooks):
         sysfolders = [re.compile("\\\\windows\\\\", re.I), re.compile("\\\\Program Files ", re.I),
                       re.compile("/usr/", re.I), \
                       re.compile("/system/", re.I), re.compile("/lib/", re.I)]
-        m = GetFirstModule()
+        m = get_first_module()
         while m:
-            path = GetModuleName(m)
+            path = get_module_name(m)
             if re.search(name, path):
                 if any(regex.search(path) for regex in sysfolders):
                     return True
@@ -1281,14 +1281,13 @@ class FunCapHook(ida_dbg.DBG_Hooks):
         is_func_start = False
 
         if ea in self.stop_points:
-            print
-            "FunCap: reached a stop point"
+            print("FunCap: reached a stop point")
             return 0
 
         if ea in self.function_calls.keys():  # coming back from a call we previously stopped on
             self.handle_return(ea)
             if self.function_calls[ea]['user_bp'] == False:
-                DelBpt(ea)
+                del_bpt(ea)
                 if self.resume:
                     request_continue_process()
                     run_requests()
@@ -1307,7 +1306,7 @@ class FunCapHook(ida_dbg.DBG_Hooks):
             run_requests()
             # we don't want ResumeProcess() to be called so we end it up here
             if self.delete_breakpoints:
-                DelBpt(ea)
+                del_bpt(ea)
             return 0
 
         elif self.is_call(ea):  # stopped on a call to a function
@@ -1317,7 +1316,7 @@ class FunCapHook(ida_dbg.DBG_Hooks):
             request_step_into()
             run_requests()
             if self.delete_breakpoints:
-                DelBpt(ea)
+                del_bpt(ea)
             return 0
 
         else:  # not call, not ret, and not start of any function
@@ -1325,7 +1324,7 @@ class FunCapHook(ida_dbg.DBG_Hooks):
                 self.handle_generic(ea)
 
         if self.delete_breakpoints:
-            DelBpt(ea)
+            del_bpt(ea)
         if self.resume:
             request_continue_process()
             run_requests()
@@ -1932,13 +1931,13 @@ class Auto:
         d.off()
         d.delAll()
         start = GetEntryOrdinal(0)
-        AddBpt(start)
+        add_bpt(start)
         segname = SegName(start)
         StartDebugger('', '', '')
         GetDebuggerEvent(WFNE_SUSP, -1);
         print
         "Auto: program entry point reached"
-        DelBpt(start)
+        del_bpt(start)
         d.addStop(LocByName("ntdll_RtlExitUserProcess"))
         d.addStop(LocByName("kernel32_ExitProcess"))
         d.on()
@@ -1952,12 +1951,12 @@ class Auto:
         d.off()
         d.delAll()
         start = GetEntryOrdinal(0)
-        AddBpt(start)
+        add_bpt(start)
         StartDebugger('', '', '')
         GetDebuggerEvent(WFNE_SUSP, -1);
         print
         "Auto: program entry point reached"
-        DelBpt(start)
+        del_bpt(start)
         d.addStop(LocByName("ntdll_RtlExitUserProcess"))
         d.addStop(LocByName("kernel32_ExitProcess"))
         d.on()
@@ -1971,12 +1970,12 @@ class Auto:
         d.off()
         d.delAll()
         start = GetEntryOrdinal(0)
-        AddBpt(start)
+        add_bpt(start)
         StartDebugger('', '', '')
         GetDebuggerEvent(WFNE_SUSP, -1);
         print
         "Auto: program entry point reached"
-        DelBpt(start)
+        del_bpt(start)
         d.addStop(LocByName(
             "kernel32_ExitProcess"))  # last breakpoint before the process terminates, to give a chance to take a memory snapshot
         d.addStop(

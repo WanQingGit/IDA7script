@@ -109,7 +109,7 @@ class XrefsFromFinder( object ):
 
     def get_current_function_xrefs_from( self ):
     
-        addr_in_func = idc.ScreenEA()
+        addr_in_func = idc.get_screen_ea()
 #         curr_func = idc.GetFunctionName( addr_in_func )
 
         refs = self.find_xrefs_from( addr_in_func )
@@ -243,7 +243,7 @@ def PLUGIN_ENTRY():
 
 
 if ReefConfig.PLUGIN_TEST:
-    print "{} - test".format(ReefConfig.PLUGIN_NAME)
+    print("{} - test".format(ReefConfig.PLUGIN_NAME))
     p = ReefPlugin()
     p.init()
     p.run()

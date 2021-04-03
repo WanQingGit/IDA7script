@@ -38,7 +38,7 @@ class MemoryReader(Reader):
             if segment.type == idaapi.SEG_XTRN:
                 continue
             valid_memory_ranges.append(
-                MemoryRange(segment.startEA, segment.endEA)
+                MemoryRange(segment.start_ea, segment.end_ea)
             )
 
         while len(ranges_left) > 0:

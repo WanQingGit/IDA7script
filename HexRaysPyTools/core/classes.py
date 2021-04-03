@@ -3,7 +3,7 @@ from PyQt5 import QtCore, QtGui
 import idaapi
 
 import HexRaysPyTools.forms
-import helper
+import HexRaysPyTools.core.helper as helper
 
 
 all_virtual_functions = {}      # name    -> VirtualMethod
@@ -125,7 +125,7 @@ class VirtualMethod(object):
                     for parent in self.parents:
                         parent.modified = True
             else:
-                print "[Warning] function {0} probably have wrong type".format(self.name)
+                print("[Warning] function {0} probably have wrong type".format(self.name))
 
     def open_function(self):
         addresses = self.addresses
@@ -184,7 +184,7 @@ class VirtualTable(object):
                 for current_function, other_function in zip(self.virtual_functions, udt_data):
                     current_function.update(other_function.name, other_function.type)
             else:
-                print "[ERROR] Something have been modified in Local types. Please refresh this view"
+                print("[ERROR] Something have been modified in Local types. Please refresh this view")
 
     def update_local_type(self):
         if self.modified:
@@ -200,7 +200,7 @@ class VirtualTable(object):
                 final_tinfo.set_numbered_type(idaapi.cvar.idati, self.ordinal, idaapi.NTF_REPLACE, self.name)
                 self.modified = False
             else:
-                print "[ERROR] Something have been modified in Local types. Please refresh this view"
+                print("[ERROR] Something have been modified in Local types. Please refresh this view")
 
     def set_first_argument_type(self, class_name):
         for function in self.virtual_functions:
@@ -322,7 +322,7 @@ class Class(object):
                     # TODO: drop class
                     raise IndexError
         except IndexError:
-            print "[ERROR] Something have been modified in Local types. Please refresh this view"
+            print("[ERROR] Something have been modified in Local types. Please refresh this view")
 
     def update_local_type(self):
         if self.modified:

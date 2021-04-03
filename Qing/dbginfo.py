@@ -123,11 +123,11 @@ class DbgInfo(object):
                 bp = idc.get_bpt_ea(i)
                 bps.append(bp)
             for bp in bps:
-                idc.DelBpt(bp)
+                idc.del_bpt(bp)
         for bp in bplist:
             ea = bp[0]
             addr = ea + self.offset
-            idc.AddBpt(addr)
+            idc.add_bpt(addr)
             idc.enable_bpt(addr, bp[1])
         return True
 
@@ -159,7 +159,7 @@ class DbgInfo(object):
         bplist = self.tracebp if tracebp else self.userbp
         for ea in bplist:
             try:
-                idc.DelBpt(ea + self.offset)
+                idc.del_bpt(ea + self.offset)
             except Exception as e:
                 print(e)
                 self.tracebp.remove(ea)
@@ -172,14 +172,14 @@ class DbgInfo(object):
             for ea in self.tracebp:
                 addr = ea + self.offset
                 if idc.get_func_off_str(addr):
-                    idc.AddBpt(addr)
+                    idc.add_bpt(addr)
                 else:
                     invalid.append(addr)
         if userbp:
             for ea in self.userbp:
                 addr = ea + self.offset
                 if idc.get_func_off_str(addr):
-                    idc.AddBpt(addr)
+                    idc.add_bpt(addr)
                 else:
                     invalid.append(addr)
         if invalid:
@@ -230,7 +230,7 @@ class DbgInfo(object):
             common.common_cmt(called, calledinfo.calledlist.keys(), "called by: ", self.offset, False)
         bpea = eafn + self.offset
         if self.enabletrace:
-            if not idc.AddBpt(bpea):
+            if not idc.add_bpt(bpea):
                 idc.enable_bpt(bpea, True)
         return True
 
@@ -271,26 +271,26 @@ class DbgInfo(object):
 
     def addbp(self, instr, ea=None):
         if ea is None:
-            ea = idc.ScreenEA()
+            ea = idc.get_screen_ea()
         func = idaapi.get_func(ea)
-        startEA = func.startEA
+        start_ea = func.start_ea
         instrtable = self.get_func_instr(startEA)
         l = instrtable.get(instr)
         if l:
             for disa in l:
-                pos = disa.offset + startEA
-                if not idc.AddBpt(pos):
-                    idc.EnableBpt(pos, True)
+                pos = disa.offset + start_ea
+                if not idc.add_bpt(pos):
+                    idc.enable_bpt(pos, True)
 
     def addbp2(self, ea=None):
         if ea is None:
-            ea = idc.ScreenEA()
+            ea = idc.get_screen_ea()
         func = idaapi.get_func(ea)
-        startEA = func.startEA
-        bps = self.get_bp2(startEA)
+        start_ea = func.start_ea
+        bps = self.get_bp2(start_ea)
         if bps.add(ea):
-            if not idc.AddBpt(ea):
-                idc.EnableBpt(ea, True)
+            if not idc.add_bpt(ea):
+                idc.enable_bpt(ea, True)
             return bps
         else:
             return False
@@ -300,11 +300,11 @@ class DbgInfo(object):
 
     def addTracebp(self, ea=None):
         if ea is None:
-            ea = idc.ScreenEA()
+            ea = idc.get_screen_ea()
         rea = ea - self.offset
         self.tracebp.add(rea)
-        if not idc.AddBpt(ea):
-            idc.EnableBpt(ea, True)
+        if not idc.add_bpt(ea):
+            idc.enable_bpt(ea, True)
 
     def delbp2(self, ea, offset, vea=None):
         funcbps = self.get_bp2(ea, True)
@@ -316,7 +316,7 @@ class DbgInfo(object):
                 if vea in varlist:
                     del varlist[vea]
                     if len(varlist) == 0:
-                        idc.EnableBpt(ea + offset, False)
+                        idc.enable_bpt(ea + offset, False)
                     return True
             else:
                 idc.enable_bpt(ea + offset, False)
@@ -338,10 +338,10 @@ class DbgInfo(object):
     def isbp2(self, ea=None):
         try:
             if ea is None:
-                ea = idc.ScreenEA()
+                ea = idc.get_screen_ea()
             func = idaapi.get_func(ea)
-            startEA = func.startEA
-            bps = self.get_bp2(startEA, True)
+            start_ea = func.start_ea
+            bps = self.get_bp2(start_ea, True)
             if bps:
                 varlist = bps.isin(ea)
                 return [varlist, bps]

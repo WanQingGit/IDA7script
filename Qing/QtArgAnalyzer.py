@@ -27,7 +27,6 @@ class VarAnalyzer(QtUiShow):
         self.id = VarAnalyzer.ninstance
         VarAnalyzer.ninstance = self.id + 1
 
-
     def init_ui(self):
         self.parent.setStyleSheet(
             "QTableView {background-color: transparent; selection-background-color: #87bdd8;}"
@@ -43,7 +42,7 @@ class VarAnalyzer(QtUiShow):
         btn_watch = QtWidgets.QPushButton("&WatchPtr")
         btn_watch.clicked.connect(self.add_var_watch)
         btn_screenEA = QtWidgets.QPushButton("&ScreenEA")
-        btn_screenEA.clicked.connect(lambda: self.printout.setText("0x%X" % idc.ScreenEA()))
+        btn_screenEA.clicked.connect(lambda: self.printout.setText("0x%X" % idc.get_screen_ea()))
         btn_origin = QtWidgets.QPushButton("&Backup")
         btn_resolve = QtWidgets.QPushButton("Restore")
         text_out = QtWidgets.QLineEdit()
@@ -187,20 +186,20 @@ class VarAnalyzer(QtUiShow):
         _var_debug()
         funcname = self.funcinput.text().encode('utf-8').strip()
         if funcname:
-            afn = idc.LocByName(funcname)
+            afn = idc.get_name_ea_simple(funcname)  # LocByName
             if afn & 1:
                 self.funcinput.setText(funcname + " is not a function")
                 return False
         else:
-            ea = idc.ScreenEA()
+            ea = idc.get_screen_ea()
             func = idaapi.get_func(ea)
             if not func:
                 return False
-            afn = func.startEA
+            afn = func.start_ea
         dbginfo = self.dbginfo
         arg = dbginfo.append_func_watch(afn)
-        if not idc.AddBpt(afn):
-            idc.EnableBpt(afn, True)
+        if not idc.add_bpt(afn):
+            idc.enable_bpt(afn, True)
         # dbginfo.addbp("RET", afn)
         if arg:
             self.argtree_append(arg)

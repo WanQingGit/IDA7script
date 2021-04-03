@@ -30,13 +30,13 @@ def _erase_reg_in_range(s_ea, e_ea, reg):
     
     #if there was a rename range with this reg containing the start of the range (s_ea) - remember it
     prev_range_s = ida_frame.find_regvar(pfn, s_ea, reg)
-    if (prev_range_s is not None) and (prev_range_s.startEA < s_ea):
-        prev_ranges += [(prev_range_s.startEA, s_ea, prev_range_s.user)]
+    if (prev_range_s is not None) and (prev_range_s.start_ea < s_ea):
+        prev_ranges += [(prev_range_s.start_ea, s_ea, prev_range_s.user)]
 
     #if there was a rename range with this reg containing the end of the range (e_ea) - remember it
     prev_range_s = ida_frame.find_regvar(pfn, e_ea, reg)
-    if (prev_range_s is not None) and (prev_range_s.startEA < e_ea) and (prev_range_s.endEA > e_ea):
-        prev_ranges += [(e_ea, prev_range_s.endEA, prev_range_s.user)]
+    if (prev_range_s is not None) and (prev_range_s.start_ea < e_ea) and (prev_range_s.end_ea > e_ea):
+        prev_ranges += [(e_ea, prev_range_s.end_ea, prev_range_s.user)]
         
         
     debug('Delete range %x : %x - %s' % (s_ea, e_ea, reg))
@@ -86,7 +86,7 @@ def _get_min_block_ranges(rgs, reg):
     rgs_new2 = []
     #assumption - rgs is sorted
     s_first_blk, _ = rgs[0]
-    func_start = sark.Function(s_first_blk).startEA
+    func_start = sark.Function(s_first_blk).start_ea
     
         
     #if range between ranges (or between function start and first range) doesn't contain the reg - add it as range
@@ -131,7 +131,7 @@ def _get_block_ranges(eas, reg):
     ranges = []
     blks = set()
     for ea in eas:
-        blk_ea = sark.CodeBlock(ea).startEA
+        blk_ea = sark.CodeBlock(ea).start_ea
         blks |= set([blk_ea])
             
     #for blk_ea in blks:
@@ -179,12 +179,12 @@ def _get_block_ranges(eas, reg):
             
         # possibility 1 - found change after only references
         if possibility_one__first_change_ea is not None:            
-            ranges += [(blk.startEA, possibility_one__first_change_ea)]
+            ranges += [(blk.start_ea, possibility_one__first_change_ea)]
             debug('p1: %x:%x' % (ranges[-1][0], ranges[-1][1]))
                     
         # possibility 2 - found only references after change    
         if possibility_two__ref_after_last_change_ea is not None:
-            ranges += [(possibility_two__ref_after_last_change_ea, blk.endEA)]
+            ranges += [(possibility_two__ref_after_last_change_ea, blk.end_ea)]
             debug('p2: %x:%x' % (ranges[-1][0], ranges[-1][1]))
 
         # possibility 3 - found sequrence change->ref->change
@@ -194,7 +194,7 @@ def _get_block_ranges(eas, reg):
         
         # possibility 4 - no change happened
         if possibility_four__no_change:
-            ranges += [(blk.startEA, blk.endEA)]
+            ranges += [(blk.start_ea, blk.end_ea)]
             debug('p4: %x:%x' % (ranges[-1][0], ranges[-1][1]))
             
 
@@ -229,4 +229,3 @@ def get_reg_names(ea):
             d[canon] = regvar.user
             
     return d  
-    

@@ -15,6 +15,7 @@ for _r in idaapi.dbg_get_registers():
     regs.add(_r[0])
 _watch_debug.off()
 
+
 class VarWatcher(QtUiShow):
     def __init__(self, dbginfo):
         super(VarWatcher, self).__init__()
@@ -198,7 +199,7 @@ class VarWatcher(QtUiShow):
     def add_var(self):
         try:
             text = self.addrinput.text().encode('utf-8').strip()
-            vals = re.sub("\s+", " ", text).split(" ")
+            vals = re.sub("\\s+", " ", text).split(" ")
             lenv = len(vals)
             if lenv == 1:
                 name = vals[0]
@@ -291,7 +292,7 @@ class VarWatcher(QtUiShow):
         if len(text) > 5:
             ea = int(text, 16)
         else:
-            ea = idc.ScreenEA()
+            ea = idc.get_screen_ea()
         dbginfo = self.dbginfo
         res = dbginfo.addbp2(ea)
         if res:

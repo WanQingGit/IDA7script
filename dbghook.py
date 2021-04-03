@@ -39,8 +39,8 @@ def blr_info_add(ea, dbghk, blrinfo):
 
 def ret_callback(ea, hook, _):
     func = idaapi.get_func(ea)
-    startEA = func.startEA
-    arginfo = hook.dbginfo.get_func_arg(startEA)
+    start_ea = func.start_ea
+    arginfo = hook.dbginfo.get_func_arg(start_ea)
     # arginfo.get_watch_value()
     # arginfo.compare_extra()
 
@@ -176,7 +176,7 @@ class MyDbgHook(idaapi.DBG_Hooks):
                             go = False
                             watcher.watchnode_update(var)
                         elif lenv > 2 and values[0] == values[-1]:
-                            idc.DelBpt(ea)
+                            idc.del_bpt(ea)
             self.go = go
             return
         elif mode & DebugMode.DISBP:
@@ -253,7 +253,7 @@ class MyDbgHook(idaapi.DBG_Hooks):
         # dbginfo = self.dbginfo
         idaapi.DBG_Hooks.unhook(self, *args)
         # self.dbginfo.bp_enable(False)
-        #     idc.DelBpt(ea)
+        #     idc.del_bpt(ea)
         # dbginfo.tracebp.clear()
 
     def __del__(self):
@@ -357,7 +357,7 @@ idc.a = debughook
 #         return 1
 #
 # idc.SetBptAttr(0x8050a42e, idc.BPTATTR_FLAGS, idaapi.BPT_ENABLED|idaapi.BPT_TRACE)
-# idc.DelBpt(idc.GetBptEA(bp))
+# idc.del_bpt(idc.GetBptEA(bp))
 # import idaapi
 # start_address = 0x47e060
 # data_length = 90000
