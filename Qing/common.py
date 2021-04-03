@@ -4,27 +4,61 @@ Created on 2019年10月17日
 
 @author: WanQing
 """
+import sys
+
+if sys.version[0] == '2':
+    from idc import SegStart, SegEnd
+else:
+    pass
+    # sys.modules["__main__"].IDAPYTHON_COMPAT_695_API = True
+
+from Qing.dbgutils import *
+
+Debugger()()
 import idc
 import idautils
 import struct
 import re
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 
 import idaapi
-from idc import SegStart, FUNCATTR_START
-from idc import SegEnd, DbgQword, ResumeProcess
-from idc import refresh_debugger_memory, ResumeProcess
-from idc import AnalyzeArea, GetEntryOrdinal
-from idc import GetFunctionName, GetFunctionAttr, FUNCATTR_END
-from idc import MakeComm, CheckBpt, SetColor, DbgDword
-from idc import SegName, Name, AddBpt, CIC_FUNC, DelBpt
-from idc import GetFirstModule, GetModuleName, GetNextModule
-from idc import GetMnem, GetDisasm, GetMnem, GetRegValue
-from idautils import Functions
-from idaapi import run_requests, GraphViewer
-from ida_dbg import request_step_into, request_continue_process
-from idc import PrevHead, GetOpnd, isCode, GetFlags, MakeCode, GetManyBytes
-from idc import StartDebugger, GetDebuggerEvent, LocByName
+
+# from idc import FUNCATTR_START
+
+# from idc import DbgQword, ResumeProcess
+# from idc import refresh_debugger_memory, ResumeProcess
+# from idc import AnalyzeArea, GetEntryOrdinal
+# from idc import GetFunctionName, GetFunctionAttr, FUNCATTR_END
+
+if sys.version[0] == '2':
+    from idc import DbgDword, GetMnem, GetRegValue
+else:
+    def DbgWord(ea):
+        return idc.read_dbg_word(ea)
+
+
+    idc.GetMe = idc.print_insn_mnem
+
+
+    def GetMnem(ea):
+        return idc.print_insn_mnem(ea)
+
+
+    def GetMe(ea):
+        return idc.print_insn_mnem(ea)
+
+
+    def GetRegValue(name):
+        return idc.get_reg_value(name)
+
+# from idc import SegName, Name, AddBpt, CIC_FUNC, DelBpt
+# from idc import GetFirstModule, GetModuleName, GetNextModule
+# from idc import GetDisasm
+# from idautils import Functions
+# from idaapi import run_requests, GraphViewer
+# from ida_dbg import request_step_into, request_continue_process
+# from idc import PrevHead, GetOpnd, isCode, GetFlags, MakeCode, GetManyBytes
+# from idc import StartDebugger, GetDebuggerEvent, LocByName
 from idc import get_item_head
 
 t2c = {"__int64": 'j', '__int16': 's', "__int32": 'i', "__int8": 'b',
@@ -34,52 +68,6 @@ t2c = {"__int64": 'j', '__int16': 's', "__int32": 'i', "__int8": 'b',
 size2c = {1: 'b', 2: 's', 4: 'i', 8: 'j'}
 basec = set(t2c.values())
 idaapi.get_idati()
-from Qing import config
-
-try:
-    if config.USE_DEBUG:
-        from Qing.dbgutils import *
-
-    else:
-        raise Exception("default debugger")
-except:
-    DBG_INFO = 3
-    DBG_WARN = 2
-    DBG_ERR = 1
-
-
-    class Debugger(object):
-
-        def __init__(self, trace=True, level=DBG_INFO, suspend=True):
-            self.trace = trace
-            self.level = level
-            self.suspend = suspend
-
-        def __call__(self, *args, **kwargs):
-            pass
-
-        def debug(self):
-            pass
-
-        def info(self, *msg):
-            if self.level >= DBG_INFO:
-                print(msg)
-
-        def warn(self, *msg):
-            if self.level >= DBG_WARN:
-                print(msg)
-
-        def err(self, *msg):
-            if self.level >= DBG_ERR:
-                print(msg)
-
-        def on(self):
-            self.trace = True
-            self.level = DBG_INFO
-
-        def off(self):
-            self.trace = False
-            self.level = DBG_WARN
 
 MAX_INT32 = (1 << 32) - 1
 MAX_INT8 = (1 << 8) - 1
@@ -502,7 +490,7 @@ def dict_compare(a, b, diff=None):
     if not isinstance(a, dict) or not isinstance(b, dict):
         return False
     res = True
-    for k, va in a.iteritems():
+    for k, va in a.items():
         vb = b.get(k)
         if va != vb:
             if isinstance(va, dict) and isinstance(vb, dict):
@@ -530,7 +518,7 @@ def v2s(v):
     elif isinstance(v, dict):
         strs = ["{"]
         count = 0
-        for k, val in v.iteritems():
+        for k, val in v.items():
             strs.append(k)
             strs.append("=")
             strs.append(v2s(val))

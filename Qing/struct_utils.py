@@ -147,7 +147,7 @@ class Structure(object):
 
 
 halfword = Arch.bits >> 4
-align = ((1 << 32) - 1) >> (halfword / 2) << (halfword / 2)
+align = ((1 << 32) - 1) >> (halfword // 2) << (halfword // 2)
 
 
 def st_rename_auto(st, tinfo=None):
@@ -174,7 +174,7 @@ def st_rename_auto(st, tinfo=None):
             if int(s[1], 16) != _offset:
                 print("offset is not equel,struct member {},cout {},but {}".format("_".join(s), offset, s[1]))
                 continue
-        except Exception, e:
+        except Exception as e:
             print("the format of name should be type_offset  except offset but get {}".format(s[1]))
         if name == s[0]:
             continue
@@ -203,9 +203,9 @@ def st_merge(stname1, stname2):
         member1 = idaapi.get_member(st1, offset)
         member2 = idaapi.get_member(st2, offset)
         if member1 is None:
-            member=member2
+            member = member2
         elif member2 is None:
-            member=member1
+            member = member1
         else:
             idaapi.get_or_guess_member_tinfo(tinfo, member)
             get_typestr(member1.t)

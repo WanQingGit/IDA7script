@@ -25,7 +25,7 @@ class QtUiShow(idaapi.PluginForm):
     def appendchild(parent, val, ign_same=False):
         preval = None
         if isinstance(val, dict):
-            for k, v in val.iteritems():
+            for k, v in val.items():
                 child = QtWidgets.QTreeWidgetItem(parent)
                 child.setText(0, str(k))
                 if ign_same:

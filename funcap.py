@@ -1139,7 +1139,7 @@ class FunCapHook(ida_dbg.DBG_Hooks):
         ea = self.get_ip()
 
         if self.is_fake_call(ea):
-            MakeComm(self.current_caller['addr'], "fake function call to 0x%x" % ea)
+            idc.MakeComm(self.current_caller['addr'], "fake function call to 0x%x" % ea)
             self.output("0x%X: fake function call to 0x%x" % (self.current_caller['addr'], ea))
             self.current_caller = self.delayed_caller
             self.delayed_caller = None
@@ -1202,7 +1202,7 @@ class FunCapHook(ida_dbg.DBG_Hooks):
         self.calls_graph[ea]['callers'].append({'name': caller_name, 'ea': caller_ea, 'offset': caller})
         self.calls_graph[ea]['name'] = name
 
-        if CheckBpt(ret_addr) > 0:
+        if idc.CheckBpt(ret_addr) > 0:
             user_bp = True
         else:
             user_bp = False
@@ -1233,13 +1233,13 @@ class FunCapHook(ida_dbg.DBG_Hooks):
         # insert IDA's comments
         if self.comments and (self.overwrite_existing or caller_ea not in self.visited):
             self.add_comments(caller_ea, context_comments)
-            MakeComm(caller_ea, "%s()" % name)
+            idc.MakeComm(caller_ea, "%s()" % name)
 
         # next time we don't need to insert comments (unles overwrite_existing is set)
         self.visited.append(caller_ea)
 
         if self.colors:
-            SetColor(ea, CIC_FUNC, self.FUNC_COLOR)
+            idc.SetColor(ea, CIC_FUNC, self.FUNC_COLOR)
 
     def is_system_lib(self, name):
         """
@@ -1467,7 +1467,7 @@ class X86CapHook(FunCapHook):
         """
         Get the return address stored on the stack or register
         """
-        return DbgDword(GetRegValue('ESP'))
+        return idc.DbgDword(GetRegValue('ESP'))
 
     def calc_ret_shift(self, ea):
         """

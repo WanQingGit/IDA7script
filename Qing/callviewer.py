@@ -44,11 +44,11 @@ class CallGraph(idaapi.GraphViewer):
             return True
         self.Clear()
         self.nodes.clear()
-        for afn, fninfo in self.fninfo.iteritems():
+        for afn, fninfo in self.fninfo.items():
             calllist = fninfo.calllist
             if calllist:
                 nodesrc = self.GetNode(afn)
-                for ea, off in calllist.iteritems():
+                for ea, off in calllist.items():
                     nodedst = self.GetNode(ea)
                     self.AddEdge(nodesrc, nodedst)
         self.refresh = False
@@ -75,7 +75,7 @@ class CallGraph(idaapi.GraphViewer):
             return None
         funcinfo = self.fninfo[afn]
 
-        for ea, callset in funcinfo.calllist.iteritems():
+        for ea, callset in funcinfo.calllist.items():
             fname = idc.get_func_off_str(ea + offset)
             for off in callset:
                 aoff = off + offset
@@ -84,7 +84,7 @@ class CallGraph(idaapi.GraphViewer):
                 ncall = self.fninfo[ea].calledlist[off]
                 rows.append([fname, "call", address, hex(aoff)[:-1], str(ncall), text])
 
-        for off, ncall in funcinfo.calledlist.iteritems():
+        for off, ncall in funcinfo.calledlist.items():
             aoff = off + offset
             offstr = idc.get_func_off_str(aoff)
             fname = offstr.split("+")[0]

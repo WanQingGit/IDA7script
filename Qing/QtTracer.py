@@ -313,13 +313,13 @@ class FuncTracer(QtBase.QtUiShow):
         root.setText(1, str(len(funcbps.bps)))
         root.bps = funcbps
         funcbps[self.id]['bpnode'] = root
-        for offset, varlist in funcbps.bps.iteritems():
+        for offset, varlist in funcbps.bps.items():
             node = QtWidgets.QTreeWidgetItem(root)
             node.setText(0, "+%X" % offset)
             node.offset = offset
             lenv = len(varlist)
             node.setText(1, str(lenv))
-            for reg, varinfo in varlist.iteritems():
+            for reg, varinfo in varlist.items():
                 varroot = QtWidgets.QTreeWidgetItem(node)
                 var = varinfo['var']
                 values = varinfo['values']
@@ -426,11 +426,11 @@ class FuncTracer(QtBase.QtUiShow):
         watchtree.clear()
         bptree.clear()
         bplist = self.dbginfo.bplist
-        for _, funcbps in bplist.iteritems():
+        for _, funcbps in bplist.items():
             self.bptree_append(funcbps)
 
         watchvarlist = self.dbginfo.watchvarlist
-        for _, var in watchvarlist.iteritems():
+        for _, var in watchvarlist.items():
             self.watchtree_append(var)
 
     def onActivated(self, text):
@@ -475,7 +475,7 @@ class FuncTracer(QtBase.QtUiShow):
     def showcall(self):
         dbginfo = self.dbginfo
         offset = dbginfo.offset
-        for tid, callinfo in dbginfo.data_callinfo.iteritems():
+        for tid, callinfo in dbginfo.data_callinfo.items():
             callviewer.CallGraph("call view " + str(tid), callinfo, offset).Show()
 
     def clone(self):
@@ -508,7 +508,7 @@ class FuncTracer(QtBase.QtUiShow):
         calldata = self.dbginfo.callinfo_load(suffix, False)
         if calldata:
             offset = self.dbginfo.offset
-            for tid, callinfo in calldata.iteritems():
+            for tid, callinfo in calldata.items():
                 callviewer.CallGraph(" ".join(["trace", str(tid), suffix]), callinfo, offset).Show()
         else:
             self.printout.setText("restore breakpoints{} failed".format(suffix))

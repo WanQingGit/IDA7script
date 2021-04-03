@@ -88,7 +88,7 @@ class DbgInfo(object):
             with open(join(config.DBGINFO_SAVE_PATH, path), "w") as fp:
                 pickle.dump(val, fp)
             return True
-        except Exception, e:
+        except Exception as e:
             print(e)
             return False
 
@@ -97,7 +97,7 @@ class DbgInfo(object):
         try:
             with open(join(config.DBGINFO_SAVE_PATH, path), "r") as fp:
                 return pickle.load(fp)
-        except Exception, e:
+        except Exception as e:
             print(e)
             if t is not None:
                 return t()
@@ -149,7 +149,7 @@ class DbgInfo(object):
         newoffset = idaapi.get_imagebase()  # common.mod_base(self.module)
         if oldoffset != newoffset:
             args = self.funcarg
-            for _, funcarg in args.iteritems():
+            for _, funcarg in args.items():
                 funcarg.addr = funcarg.ea + newoffset
             self.offset = newoffset
             for ea, funcbps in self.bplist:
@@ -160,7 +160,7 @@ class DbgInfo(object):
         for ea in bplist:
             try:
                 idc.DelBpt(ea + self.offset)
-            except Exception, e:
+            except Exception as e:
                 print(e)
                 self.tracebp.remove(ea)
         if clear:
@@ -191,15 +191,15 @@ class DbgInfo(object):
         for ea in bplist:
             try:
                 idc.enable_bpt(ea + self.offset, enable)
-            except Exception, e:
+            except Exception as e:
                 print(e)
                 self.userbp.remove(ea)
 
     def bp_update(self):
         invalid = []
-        for bp in range(idc.GetBptQty()):
-            bpea = idc.GetBptEA(bp)
-            offstr = idc.GetFuncOffset(bpea)
+        for bp in range(idc.get_bpt_qty()):
+            bpea = idc.get_bpt_ea(bp)
+            offstr = idc.get_func_off_str(bpea)
             if not offstr:
                 invalid.append(bpea)
                 continue
@@ -212,7 +212,7 @@ class DbgInfo(object):
             print ("invalid bp:", str(invalid))
 
     def addcallinfo(self, called, caller,tid=0):
-        offcaller = idc.GetFuncOffset(caller)
+        offcaller = idc.get_func_off_str(caller)
         ecalled = called - self.offset
         calledinfo = self.get_callinfo(ecalled,tid)
         if not offcaller:
@@ -329,7 +329,7 @@ class DbgInfo(object):
         bplist = self.bplist
         funcbps = bplist.get(ea)
         if funcbps:
-            for offset, _ in funcbps.bps.iteritems():
+            for offset, _ in funcbps.bps.items():
                 idc.enable_bpt(offset + funcbps.addr, False)
             del bplist[ea]
             return True
@@ -499,7 +499,7 @@ class DbgInfo(object):
         ea = ea.v
         for i in range(num):
             v = collections.OrderedDict()
-            for offset, m in st_member.iteritems():
+            for offset, m in st_member.items():
                 if m.flag & VAR_ARR:
                     count = m.num
                 else:

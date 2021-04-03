@@ -8,7 +8,7 @@ class DebugMode(object):
 
 
 DEBUG_MODE = DebugMode.NORMAL
-USE_DEBUG = True
+USE_DEBUG = False
 import os
 
 DBGINFO_SAVE_PATH = os.getcwd() + "\\dbginfo-data"

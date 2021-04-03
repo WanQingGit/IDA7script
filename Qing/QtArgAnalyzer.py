@@ -319,7 +319,7 @@ class VarAnalyzer(QtUiShow):
         funcarg[self.id]['argnode'] = root
         watchvar = funcarg.watchvar
         if len(funcarg.arguments) > 0:
-            for k, v in funcarg.arguments.iteritems():
+            for k, v in funcarg.arguments.items():
                 propnode = QtWidgets.QTreeWidgetItem(root)
                 propnode.setText(0, k)
                 if k in watchvar:
@@ -342,7 +342,7 @@ class VarAnalyzer(QtUiShow):
                             prevValue = value
         else:
             arginfos = funcarg.arginfos
-            for name, _ in arginfos.iteritems():
+            for name, _ in arginfos.items():
                 propnode = QtWidgets.QTreeWidgetItem(root)
                 propnode.setText(0, name)
                 if name in watchvar:
@@ -366,13 +366,13 @@ class VarAnalyzer(QtUiShow):
             root.setBackground(0, VarAnalyzer.brush_red)
         else:
             root.setBackground(0, VarAnalyzer.brush_white)
-        for k, v in funcarg.pointer.iteritems():
+        for k, v in funcarg.pointer.items():
             propnode = QtWidgets.QTreeWidgetItem(root)
             lenv = len(v)
             propnode.setText(0, k)
             propnode.setText(1, str(lenv))
             QtUiShow.appendchild(propnode, v, True)
-            # for i, dt in v.iteritems():
+            # for i, dt in v.items():
             #     child = QtWidgets.QTreeWidgetItem(propnode)
             #     child.setText(0, str(i))
             #     # dt = v[i]
@@ -391,7 +391,7 @@ class VarAnalyzer(QtUiShow):
         watchtree.clear()
         argtree.clear()
         watchfunc = self.dbginfo.watchfunc
-        for _, funcarg in watchfunc.iteritems():
+        for _, funcarg in watchfunc.items():
             self.argtree_append(funcarg)
 
     def onActivated(self, text):

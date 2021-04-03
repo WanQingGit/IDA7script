@@ -224,8 +224,8 @@ class FlagBrowserPlugin(PluginForm):
         # Populate PluginForm
         try:
             self.PopulateTree(self.ea)
-        except Exception, e:
-            print '[*] Exception occurred during tree population: %s' % str(e)
+        except Exception as e:
+            print('[*] Exception occurred during tree population: %s' % str(e))
             self.Close(0)
             raise
 

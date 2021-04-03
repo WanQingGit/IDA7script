@@ -11,7 +11,6 @@ from collections import defaultdict
 from Qing.QtArgAnalyzer import VarAnalyzer
 from Qing.QtVarWatcher import VarWatcher
 from Qing.QtTracer import FuncTracer
-from idc import DbgDword, GetRegValue
 
 _vars = dir()
 if "CMT_OVERRIDE" not in _vars:  # override
@@ -168,7 +167,7 @@ class MyDbgHook(idaapi.DBG_Hooks):
             go = True
             watcher = self.varWathcer
             varlist = dbginfo.watchvarlist
-            for _, var in varlist.iteritems():
+            for _, var in varlist.items():
                 if dbginfo.read_var(var):
                     values = var.values
                     lenv = len(values)
@@ -191,7 +190,7 @@ class MyDbgHook(idaapi.DBG_Hooks):
             bps = varinfo[1]
             varlist = varinfo[0]
             watcher = self.varWathcer
-            for _ea, varinfo in varlist.iteritems():
+            for _ea, varinfo in varlist.items():
                 var = varinfo['var']
                 values = var.values
                 index = len(values)

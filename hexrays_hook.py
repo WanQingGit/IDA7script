@@ -66,7 +66,7 @@ class HexraysHook(object):
         pseudocode_instances = self.pseudocode_instances
         # restore colors
         if pseudocode_instances:
-            for k, _ in pseudocode_instances.iteritems():
+            for k, _ in pseudocode_instances.items():
                 self.reset_colors(k, ignore_vd)
             pseudocode_instances.clear()
         return

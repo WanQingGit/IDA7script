@@ -1,6 +1,8 @@
 # -*- coding:utf-8 -*-
 
 # ======= import =======
+from collections import OrderedDict
+
 from Qing import common
 from Qing.common import *
 import idautils
@@ -113,7 +115,7 @@ class FuncBps(BaseObj):
                 return False
             varlist[ea] = {"var": var, "indexs": []}
             return True
-        for offset, varlist in self.bps.iteritems():
+        for offset, varlist in self.bps.items():
             res = False
             if self.addvar(var, offset):
                 res = True
@@ -182,7 +184,7 @@ class FuncArg(BaseObj):
         if self.refresh:
             return self.cache_args
         strs = []
-        for k, v in self.arguments.iteritems():
+        for k, v in self.arguments.items():
             strs.append(k)
             strs.append(":")
             if len(set(v)) == 1:
@@ -198,7 +200,7 @@ class FuncArg(BaseObj):
         return self.cache_args
 
     def compare_extra(self, a=-2, b=-1):
-        for k, v in self.pointer.iteritems():
+        for k, v in self.pointer.items():
             dta = v[a]
             dtb = v[b]
             alen = len(dta)
@@ -213,7 +215,7 @@ class FuncArg(BaseObj):
                         diff = {}
                         isequal = dict_compare(itema, dtb[i], diff)
                         if not isequal:
-                            print v2s(isequal)
+                            print(v2s(isequal))
                     else:
                         print(self.sValByName([-2, -1], k, 0, i + 1))
 
@@ -223,7 +225,7 @@ class FuncArg(BaseObj):
         strs = []
         if n < 0:
             n = self.narg + n
-        for k, v in self.pointer.iteritems():
+        for k, v in self.pointer.items():
             dt = v.get(n)
             if not dt:
                 continue
@@ -318,7 +320,7 @@ class FuncArg(BaseObj):
             sp = Arch.sp()
         except:
             return
-        for name, varinfo in self.arginfos.iteritems():
+        for name, varinfo in self.arginfos.items():
             if varinfo.isreg:
                 # reg = (position.get_reginfo() >> 3) - 1
                 val = idc.GetRegValue(varinfo.position)

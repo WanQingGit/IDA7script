@@ -29,19 +29,19 @@ def _init_imported_ea():
         # False -> Stop enumeration
         return True
 
-    print "[Info] Collecting information about imports"
+    print ("[Info] Collecting information about imports")
     imported_ea.clear()
     nimps = idaapi.get_import_module_qty()
 
-    for i in xrange(0, nimps):
+    for i in range(0, nimps):
         name = idaapi.get_import_module_name(i)
         if not name:
-            print "[Warning] Failed to get import module name for #%d" % i
+            print ("[Warning] Failed to get import module name for #%d" % i)
             continue
 
         # print "Walking-> %s" % name
         idaapi.enum_import_names(i, imp_cb)
-    print "[Info] Done..."
+    print ("[Info] Done...")
 
 
 def _init_demangled_names():
@@ -55,7 +55,7 @@ def _init_demangled_names():
         if short_name:
             short_name = common.demangled_name_to_c_str(short_name)
             demangled_names[short_name].add(address - idaapi.get_imagebase())
-    print "[DEBUG] Demangled names have been initialized"
+    print("[DEBUG] Demangled names have been initialized")
 
 
 def _reset_touched_functions(*args):

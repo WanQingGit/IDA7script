@@ -5,9 +5,9 @@ from Qing.common import WordObj
 from Qing import config, common
 from Qing.config import DebugMode
 import re
-import func_utils
+import Qing.func_utils as func_utils
 from Qing.struct_utils import WatchVar
-from QtBase import QtUiShow
+from Qing.QtBase import QtUiShow
 
 _watch_debug = common.Debugger()
 regs = set()
@@ -385,13 +385,13 @@ class VarWatcher(QtUiShow):
         root.setText(1, str(len(funcbps.bps)))
         root.bps = funcbps
         funcbps[self.id]['bpnode'] = root
-        for offset, varlist in funcbps.bps.iteritems():
+        for offset, varlist in funcbps.bps.items():
             node = QtWidgets.QTreeWidgetItem(root)
             node.setText(0, "+%X" % offset)
             node.offset = offset
             lenv = len(varlist)
             node.setText(1, str(lenv))
-            for ea, varinfo in varlist.iteritems():
+            for ea, varinfo in varlist.items():
                 varroot = QtWidgets.QTreeWidgetItem(node)
                 var = varinfo['var']
                 values = var.values
@@ -498,17 +498,17 @@ class VarWatcher(QtUiShow):
         bptree = self.bptree
         bptree.clear()
         bplist = self.dbginfo.bplist
-        for _, funcbps in bplist.iteritems():
+        for _, funcbps in bplist.items():
             self.bptree_append(funcbps)
 
     def watchtree_reload(self):
         watchtree = self.watchtree
         watchtree.clear()
         watchvarlist = self.dbginfo.watchvarlist
-        for _, var in watchvarlist.iteritems():
+        for _, var in watchvarlist.items():
             self.watchtree_append(var)
         regvarlist = self.dbginfo.regvarlist
-        for _, var in regvarlist.iteritems():
+        for _, var in regvarlist.items():
             self.watchtree_append(var)
 
     def load_data(self):
@@ -532,7 +532,7 @@ class VarWatcher(QtUiShow):
             else:
                 funcbps = item.bps
                 addr = funcbps.addr
-                for offset, _ in funcbps.bps.iteritems():
+                for offset, _ in funcbps.bps.items():
                     bpea = offset + addr
                     state = idc.check_bpt(bpea)
                     if state != -1:
